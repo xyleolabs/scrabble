@@ -1,3 +1,6 @@
+#shortname:OWL3
+#longname:Official Tournament and Club Word List 2014 Edition
+#language:en
 AERATION
 AROINTED
 DERATION
