@@ -4,13 +4,17 @@ from collections import defaultdict
 from word_definer import Definer
 from multiprocessing import Pool
 from collections import OrderedDict
+import re
 
 # d = defaultdict(list)
 d = OrderedDict()
 
+WORD_CLEANING_PATTERN = re.compile('[\W_]+')
+
 def insert_defined_word(def_tuple):
     global d
     word = ''.join(def_tuple[0].strip().split())
+    word = WORD_CLEANING_PATTERN.sub('', word)
     definition = ' '.join(def_tuple[1].strip().split())
 
     key = ''.join(sorted(word))
@@ -131,7 +135,10 @@ def generate_hook_flash_cards(hook_list, word_list):
     build_flash_cards_sorted()
 
 def usage():
-    print "card_maker.py -i <word list>"
+    print "card_maker.py -i <word list>" \
+          " [--hook_list <reference hook list>]" \
+          " [-s skip querying for definition]" \
+          " [-d definition is included in the input]"
 
 
 def main():
