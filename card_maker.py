@@ -1,12 +1,10 @@
 import sys
 import getopt
-from collections import defaultdict
 from word_definer import Definer
 from multiprocessing import Pool
 from collections import OrderedDict
 import re
 
-# d = defaultdict(list)
 d = OrderedDict()
 
 WORD_CLEANING_PATTERN = re.compile('[\W_]+')

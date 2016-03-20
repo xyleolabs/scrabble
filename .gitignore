@@ -6,6 +6,10 @@
 *.zip
 *.tar.gz
 *.tar
+*.swp
+
+# Word Lists Exclude
+word_lists
 
 #########
 # All JetBrains Excludes
