@@ -6,10 +6,12 @@ from collections import OrderedDict
 import re
 
 d = OrderedDict()
+anki_format = False
 
 WORD_CLEANING_PATTERN = re.compile('[\W_]+')
 
 def insert_defined_word(def_tuple):
+    global anki_format
     global d
     word = ''.join(def_tuple[0].strip().split())
     word = WORD_CLEANING_PATTERN.sub('', word)
@@ -20,7 +22,10 @@ def insert_defined_word(def_tuple):
     if len(def_tuple) == 1 or definition == "":
         value = word
     else:
-        value = "*{0}* - {1}".format(word, definition)
+        if anki_format:
+            value = "<B><span style=\"color:#F28500\">{0}</span></B> - {1}".format(word, definition)
+        else:
+            value = "*{0}* - {1}".format(word, definition)
 
     if key not in d:
         d[key] = [value]
@@ -32,14 +37,25 @@ def define(word):
     return definer.define()
 
 def build_flash_cards():
+    global anki_format
     flash_cards_file = open("flash_cards.txt", "w")
+
+    front_back_sep="\t"
+    ans_sep="\n"
+    card_sep="@"
+
+    if anki_format:
+        front_back_sep="@"
+        ans_sep="<BR>"
+        card_sep="\n"
+
     try:
         for anagram, words in d.items():
-            card = "{0}\t".format(anagram)
+            card = "{0}{1}".format(anagram, front_back_sep)
 
             for word in words:
-                card += "{0}\n".format(word)
-            card += "@"
+                card += "{0}{1}".format(word, ans_sep)
+            card += card_sep
 
             flash_cards_file.write(card)
     finally:
@@ -136,16 +152,19 @@ def usage():
     print "card_maker.py -i <word list>" \
           " [--hook_list <reference hook list>]" \
           " [-s skip querying for definition]" \
-          " [-d definition is included in the input]"
+          " [-d definition is included in the input]" \
+          " [-a,--anki_format enable Anki output format]"
 
 
 def main():
     try:
-        options, arguments = getopt.getopt(sys.argv[1:], "i:h:sd", ["input_list=,hook_list=,skip_define,definition_included"])
+        options, arguments = getopt.getopt(sys.argv[1:], "i:h:sda",
+                                           ["input_list=,hook_list=,skip_define,definition_included,anki_format"])
     except getopt.GetoptError as err:
         print str(err)
         sys.exit(2)
 
+    global anki_format
     word_list = None
     hook_list = None
     skip_define = False
@@ -158,6 +177,8 @@ def main():
             skip_define = True
         elif opt in ("-d", "--definition_included"):
             def_included = True
+        elif opt in ("-a", "--anki_format"):
+            anki_format = True
         else:
             assert False, "unhandled option: {0}".format(opt)
 
